@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Dplayer</title>
+  <meta charset="UTF-8">
+  <!-- WebTorrent  -->
+  <script src="https://cdn.jsdelivr.net/webtorrent/latest/webtorrent.min.js"></script>
+  <!-- Player Style -->
+  <link rel=stylesheet type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/dplayer/1.22.2/DPlayer.min.css"></link>
+  <!-- Player -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dplayer/1.22.2/DPlayer.min.js"></script>
+</head>
+
+<body>
+  <div id="dplayer"></div>
+  <script>
+  var torrentId = 'magnet:?xt=urn:btih:6a9759bffd5c0af65319979fb7832189f4f3c35d&dn=sintel.mp4&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.fastcast.nz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=wss%3A%2F%2Ftracker.webtorrent.io&ws=https%3A%2F%2Fwebtorrent.io%2Ftorrents%2Fsintel-1024-surround.mp4';
+  const dp = new DPlayer({
+    container: document.getElementById('dplayer'),
+    screenshot:true,
+    autoplay:true,
+    preload:'auto',
+    video: {
+        url: `${torrentId}`,
+        type: 'customWebTorrent',
+        customType: {
+            'customWebTorrent': function (video, player) {
+                player.container.classList.add('dplayer-loading');
+                const client = new WebTorrent();
+                const torrentId = video.src;
+                client.add(torrentId, (torrent) => {
+                    const file = torrent.files.find((file) => file.name.endsWith('.mp4'));
+                    file.renderTo(video, {
+                        autoplay: player.options.autoplay
+                    }, () => {
+                        player.container.classList.remove('dplayer-loading');
+                    });
+                });
+            }
+        }
+    }
+});
+  </script>
+</body>
+</html>
